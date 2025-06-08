@@ -1,0 +1,6 @@
+deepface
+flask
+tensorflow==2.10
+matplotlib
+numpy
+pandas

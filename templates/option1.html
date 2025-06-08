@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Image - Emotion Detection System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --gray-light: #e2e8f0;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .header-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+      width: 100%;
+    }
+    
+    .page-title {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      color: var(--primary-dark);
+      font-size: 2rem;
+    }
+    
+    .upload-container {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .upload-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .upload-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-title {
+      font-size: 1.5rem;
+      color: var(--primary-dark);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    
+    .card-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background-color: var(--secondary);
+      border-radius: 2px;
+    }
+    
+    .upload-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .file-input-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border: 2px dashed var(--gray-light);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .file-input-container:hover {
+      border-color: var(--primary);
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+    
+    .file-input-container input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .file-icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    
+    .file-text {
+      color: var(--gray);
+      text-align: center;
+      padding: 0 1rem;
+    }
+    
+    .file-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+    }
+    
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      display: inline-block;
+      text-align: center;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background-color: var(--gray-light);
+      color: var(--dark);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--gray);
+      color: white;
+    }
+    
+    .camera-container {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background-color: #000;
+      margin-bottom: 1.5rem;
+    }
+    
+    #camera-stream {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    
+    #captured-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      background-color: #f8f8f8;
+    }
+    
+    .camera-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--gray-light);
+      color: var(--gray);
+    }
+    
+    .camera-controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .result-container {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: var(--gray-light);
+      text-align: center;
+      display: none;
+    }
+    
+    .result-emotion {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+    
+    .success-message {
+      color: var(--success);
+      font-weight: 500;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+      .upload-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .upload-card {
+        max-width: 100%;
+      }
+      
+      .camera-container {
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 class="header-title">Emotion Detection System</h1>
+</header>
+
+<main>
+  <h2 class="page-title">Upload an Image for Emotion Detection</h2>
+  
+  <div class="upload-container">
+    <!-- Upload from computer -->
+    <div class="upload-card">
+      <h3 class="card-title">Upload from Device</h3>
+      
+      <form id="file-upload-form" class="upload-form" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+        <div class="file-input-container">
+          <div class="file-icon">&#128194;</div>
+          <p class="file-text">Click or drag & drop to upload an image</p>
+          <input type="file" id="file-upload" name="file" accept="image/*" required />
+          <img id="file-preview" class="file-preview" alt="Preview" />
+        </div>
+        
+        <button type="submit" class="btn">Analyze Emotion</button>
+        <button type="button" id="reupload-btn" class="btn btn-secondary" style="display: none;">Re-upload</button>
+      </form>
+      
+      <div id="file-result" class="result-container">
+        <div class="result-emotion" id="file-emotion-prediction"></div>
+        <div id="file-uploaded-message" class="success-message">Image successfully analyzed!</div>
+      </div>
+    </div>
+    
+    <!-- Upload from camera -->
+    <div class="upload-card">
+      <h3 class="card-title">Capture from Camera</h3>
+      
+      <div class="camera-container">
+        <video id="camera-stream" autoplay playsinline></video>
+        <img id="captured-image" alt="Captured image" />
+        <div id="camera-placeholder" class="camera-placeholder">
+          <div class="file-icon">&#128247;</div>
+          <p class="file-text">Camera feed will appear here</p>
+        </div>
+      </div>
+      
+      <div class="camera-controls">
+        <button id="start-camera-btn" class="btn">Start Camera</button>
+        <button id="capture-btn" class="btn" style="display: none;">Capture Photo</button>
+        <button id="retake-btn" class="btn btn-secondary" style="display: none;">Retake</button>
+        <button id="upload-captured-btn" class="btn" style="display: none;">Analyze Emotion</button>
+      </div>
+      
+      <div id="camera-result" class="result-container">
+        <div class="result-emotion" id="camera-emotion-prediction"></div>
+        <div id="camera-upload-message" class="success-message">Image successfully analyzed!</div>
+      </div>
+      
+      <canvas id="capture-canvas" style="display:none;"></canvas>
+    </div>
+  </div>
+  
+  <a href="{{ url_for('home') }}" class="back-link">
+    <button class="btn btn-secondary">Return to Home</button>
+  </a>
+</main>
+
+<script>
+  // File upload handling
+  const fileInput = document.getElementById('file-upload');
+  const filePreview = document.getElementById('file-preview');
+  const fileUploadForm = document.getElementById('file-upload-form');
+  const fileResult = document.getElementById('file-result');
+  const fileEmotionPrediction = document.getElementById('file-emotion-prediction');
+  const fileUploadedMessage = document.getElementById('file-uploaded-message');
+  const reuploadBtn = document.getElementById('reupload-btn');
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) {
+      filePreview.style.display = 'none';
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = e => {
+      filePreview.src = e.target.result;
+      filePreview.style.display = 'block';
+      fileResult.style.display = 'none';
+      reuploadBtn.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  fileUploadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(fileUploadForm);
+    fetch('{{ url_for("upload_file") }}', {
+      method: 'POST',
+      body: formData
+    }).then(async response => {
+      if (response.ok) {
+        const result = await response.json();
+        fileResult.style.display = 'block';
+        
+        if(result.filename) {
+          filePreview.src = '{{ url_for("uploaded_file", filename="") }}' + result.filename;
+          filePreview.style.display = 'block';
+          fileUploadedMessage.style.display = 'block';
+          reuploadBtn.style.display = 'inline-block'; // Show the re-upload button
+        }
+        
+        if(result.emotion) {
+          fileEmotionPrediction.textContent = "Predicted Emotion: " + result.emotion;
+        } else {
+          fileEmotionPrediction.textContent = "";
+        }
+      } else {
+        alert('Upload failed! Try again.');
+      }
+    }).catch(() => {
+      alert('Upload failed! Try again.');
+    });
+  });
+
+  reuploadBtn.addEventListener('click', () => {
+    // Reset the file input and preview
+    fileInput.value = '';
+    filePreview.style.display = 'none';
+    fileResult.style.display = 'none';
+    fileEmotionPrediction.textContent = '';
+    fileUploadedMessage.style.display = 'none';
+    reuploadBtn.style.display = 'none';
+  });
+
+  // Camera handling
+  const startCameraBtn = document.getElementById('start-camera-btn');
+  const captureBtn = document.getElementById('capture-btn');
+  const retakeBtn = document.getElementById('retake-btn');
+  const uploadCapturedBtn = document.getElementById('upload-captured-btn');
+  const video = document.getElementById('camera-stream');
+  const capturedImage = document.getElementById('captured-image');
+  const canvas = document.getElementById('capture-canvas');
+  const cameraPlaceholder = document.getElementById('camera-placeholder');
+  const cameraResult = document.getElementById('camera-result');
+  const cameraEmotionPrediction = document.getElementById('camera-emotion-prediction');
+  const cameraUploadMessage = document.getElementById('camera-upload-message');
+
+  let cameraStream = null;
+
+  startCameraBtn.addEventListener('click', async () => {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = cameraStream;
+      video.style.display = 'block';
+      capturedImage.style.display = 'none';
+      cameraPlaceholder.style.display = 'none';
+      
+      startCameraBtn.style.display = 'none';
+      captureBtn.style.display = 'inline-block';
+      retakeBtn.style.display = 'none';
+      uploadCapturedBtn.style.display = 'none';
+      cameraResult.style.display = 'none';
+    } catch (err) {
+      alert('Error accessing camera: ' + err.message);
+    }
+  });
+
+  captureBtn.addEventListener('click', () => {
+    const width = video.videoWidth;
+    const height = video.videoHeight;
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+    
+    capturedImage.src = canvas.toDataURL('image/png');
+    capturedImage.style.display = 'block';
+    video.style.display = 'none';
+    
+    captureBtn.style.display = 'none';
+    retakeBtn.style.display = 'inline-block';
+    uploadCapturedBtn.style.display = 'inline-block';
+    
+    // Stop camera stream
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+  });
+
+  retakeBtn.addEventListener('click', async () => {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = cameraStream;
+      video.style.display = 'block';
+      capturedImage.style.display = 'none';
+      
+      captureBtn.style.display = 'inline-block';
+      retakeBtn.style.display = 'none';
+      uploadCapturedBtn.style.display = 'none';
+      cameraResult.style.display = 'none';
+    } catch (err) {
+      alert('Error accessing camera: ' + err.message);
+    }
+  });
+
+  uploadCapturedBtn.addEventListener('click', async () => {
+    if (!capturedImage.src) {
+      alert('No image captured to upload.');
+      return;
+    }
+    
+    const blob = await (await fetch(capturedImage.src)).blob();
+    const formData = new FormData();
+    formData.append('file', blob, 'camera_capture.png');
+
+    try {
+      const response = await fetch('{{ url_for("upload_file") }}', {
+        method: 'POST',
+        body: formData
+      });
+      if (response.ok) {
+        const result = await response.json();
+        cameraResult.style.display = 'block';
+        
+        if(result.emotion) {
+          cameraEmotionPrediction.textContent = "Predicted Emotion: " + result.emotion;
+        } else {
+          cameraEmotionPrediction.textContent = "";
+        }
+        
+        cameraUploadMessage.style.display = 'block';
+
+        // Reset UI: hide video, capture and upload buttons; show start button
+        video.style.display = 'none';
+        captureBtn.style.display = 'none';
+        uploadCapturedBtn.style.display = 'none';
+        startCameraBtn.style.display = 'inline-block';
+      } else {
+        alert('Upload failed!');
+      }
+    } catch (err) {
+      alert('Upload failed!');
+    }
+  });
+</script>
+
+</body>
+</html>
+

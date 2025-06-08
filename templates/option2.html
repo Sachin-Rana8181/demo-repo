@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Emotion Detection</title>
+ <style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary: #10b981;
+        --dark: #1e293b;
+        --light: #f8fafc;
+        --gray: #64748b;
+        --gray-light: #e2e8f0;
+        --success: #10b981;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--light);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        font-weight: 700;
+        font-size: 1.8rem;
+        padding: 1rem 2rem;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    video {
+        margin-top: 2rem;
+        border: 4px solid var(--primary);
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    #emotion {
+        margin-top: 1.5rem;
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--dark);
+        background: var(--gray-light);
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .back-link {
+        display: block;
+        margin-top: 2rem;
+        text-align: center;
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        color: var(--primary-dark);
+    }
+</style>
+
+</head>
+<body>
+
+    <header>Live Emotion Detection</header>
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <div id="emotion">Detecting...</div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const emotionText = document.getElementById('emotion');
+
+        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+            video.srcObject = stream;
+        });
+
+        setInterval(() => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                emotionText.textContent = `Detected Emotion: ${data.emotion}`;
+            })
+            .catch(err => {
+                emotionText.textContent = "Error detecting emotion.";
+                console.error(err);
+            });
+        }, 1000);
+    </script>
+
+    <a href="{{ url_for('home') }}" class="back-link">&larr; Back to Home</a>
+</body>
+</html>
+
+
+
